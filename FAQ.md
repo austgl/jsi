@@ -1,0 +1,45 @@
+# JSI 集成第三方类库的时候.经常碰到的问题:
+
+## 变量悬空现象 ##
+> 不要出现:
+```
+    if (!window.Element){
+        var Element = new Object();
+    }
+```
+> 因为,这等价于:
+```
+    var Element = undefined;
+    if (!window.Element){
+        Element = new Object();
+    }
+```
+> 改成：
+```
+    var Element = window.Element || {};
+```
+
+> 或者：
+```
+    var Element = window.Element ;
+    if(!Element){
+      Element = new Object();
+    }
+```
+
+
+## 域(scope)短路现象 ##
+> 不要通过new Function创建于当前scope相关的函数:
+```
+   var object1 = 1;
+   var object2 = 2;
+   var fn = new Function("alert(object1+object2)");//有问题
+```
+> 因为 new Function方法创建的函数,上级scope是全局scope. 而JSI的执行域在当前的装在单元,不能确保完全包含这些当前脚本的对象.
+
+> 要实现new Function的时候以当前scope作为上级scope,可使用:
+```
+   var object1 = 1;
+   var object2 = 2;
+   var fn = eval("fucntion(){alert(object1,object2)}");
+```

@@ -1,0 +1,59 @@
+## JSI 简介 ##
+
+JSI 是一个用来管理脚本依赖关系的工程，对于结构良好的脚本，JSI可以在不修改源码的基础上，将脚本纳入JSI的管理体系。
+JSI 依靠一种包定义脚本，来实现脚本信息的描述。
+
+  * 核心思想
+    1. 控制反转(Inversion of Control)/依赖注入(Dependency Injection)
+> > > 如果，你只是听过这些名词，但正为何需要如此而困惑，那么你可以离开这个页面了，因为JSI同样会让你困惑。
+
+  * 包定义文件的作用
+    1. 申明公开变量
+> > > 忘记闭包吧，在JSI中由系统处理内部元素的保护。
+    1. 申明依赖关系
+> > > 有了明确的依赖之后，系统才能更好的帮你组织资源。
+  * 如何使用JSI
+    1. java环境
+> > > 把JSI.jar 扔进WEB-INF/lib,配置好JSIFilter。
+    1. php环境
+> > > 在你的scripts 根目录下加上一个index.php(可以从 JSI.jar中获取)。
+    1. java CGI 环境
+> > > 把cgi.jar 和jsi.cgi 扔进/cgi-bin,把脚本路径指向该目录(可以使用一个跳转script)。
+    1. JSA 测试服务器
+> > > 把JSA-SERVER.jar 扔进 网站根目录,双击运用该jar。
+
+## 如何发布类库 ##
+
+> _**打包成jar或者Zip**_ 。JSI的类库是可增量部署的，也就是说，如果需要增加其他类库，只要吧jar扔到类路径下就可以了。
+> 和Jar管理差不多，只要把类库打包后扔到包路径下，系统就能自动找到。
+
+> 这依赖于一些服务端程序，如index.php，或者Java的JSIFilter。
+
+> 类库查找的路径是（按下列排列顺序查找）：
+    1. scripts/
+    1. scripts/(**.jar|**.zip)
+    1. WEB-INF/classes
+    1. WEB-INF/lib/(**.jar|**.zip)
+
+## 其他功能 ##
+  * JSICDN 功能
+> > 集脚本合并、压缩、调试功能于一身。
+> > 实例：http://jsicdn.appspot.com。
+  * Lite 模板编译集成
+> > 待续、、、、
+  * JSA 压缩集成
+> > 见：http://code.google.com/p/jsi/wiki/JSAUserGuide
+  * JSA 自动生成包定义文件
+> > 见：http://code.google.com/p/jsi/wiki/JSAUserGuide
+
+## 使用误区 ##
+  * 不用解压JSI.jar
+> > 我见过一些JSI用户，使用JSI的时候，直接吧我们发布的JSI.jar 解压到scripts目录。
+> > 这其实并不正确，JSI.jar 之所以打包成Jar 并不是让你去解压的，这是一种JSI类库的发布方式。
+  * 上线产品中使用即时装载模式
+> > 尽量不要这样搞，会导致浏览器阻塞。只有已经缓存的脚本才能即时装载。
+
+## 补充 ##
+
+> 如果对上述描述有任何疑问,可留言讨论:
+

@@ -1,0 +1,106 @@
+## JSA简介 ##
+
+JSA是一个为JSI服务的脚本处理工具（JSA!=JSI）。更多的人用他来压缩脚本。
+
+JSA的主要功能有：
+  * 兼容JSI的脚本库导出
+    1. 导出成普通脚本（脱离JSI运行环境）
+> > > 如果你只是想在开发期间采用JSI，运行时脱离JSI环境，那么你可以使用该功能。
+    1. 编译模板
+> > > 如果你在项目中使用了[Lite](http://lite.googlecode.com)；那么，JSI可以帮你在导出的时候，自动编译模板数据，将模板的解析过程在导出的时候完成，提高模板运行效率。
+    1. 导出成JSI 预装载脚本
+> > > 按需导出预装载格式的脚本文件。
+    1. 导出成JAR包
+> > > 按需导出你需要的一个脚本库子集，并jar打包（JSI调试期间支持jar方式的脚本库）。
+    1. 导出成XML包
+> > > 类似jar包，因为php默认不安装zip扩展，无法解析zip包，于是按java property xml的格式打包zip数据
+  * 脚本压缩
+
+> > 压缩脚本，处理编码。
+  * 脚本分析
+> > 收集脚本语法信息，可用于代码问题检查和质量审核的参考。
+  * 自动生成JSI包定义文件
+> > 可以用于自动生成依赖申明的初稿。也可用来优化包定义文件，因为，如果工程很大，人工设置依赖也是一件烦人的事情，也容易出错。
+
+## 使用实例 ##
+
+> ### WEB 接口 ###
+    1. 下载:JSA-SERVER.jar（1.9M）。
+    1. 双击运行
+> > > 如果你计算机jar文件默认打开方式不是java，那么采用命令行：java -jar [JSA-LIB]/JSA-SERVER.jar
+    1. 在您的窗口左上角将出现一个JSA服务器监控窗口。
+      * JSA服务器默认网站目录是您的当前目录,您可以重新选择。
+      * 默认脚本路径是/scripts/
+      * 监控窗口的左下角有三个链接：文档首页，网站首页，工具首页
+    1. 点击工具首页
+      * 系统打开默认浏览器，并显示工具目录
+        1. 您将看到三个工具简介
+        1. 剩下的事情自己看着办吧，相信你足够聪明<sup>_</sup>
+
+> ### Ant接口 ###
+    1. 下载:JSA-CMD.jar（8M，因为要模拟浏览器环境来编译模板，打包了htmlunit）。
+    1. JSI脚本导出实例
+```
+	<target name="JSA">
+		<java classname="org.jside.jsi.tools.export.ExportAction" classpath="build/dest/JSA-CMD.jar">
+			<arg value="-scriptBase" />
+			<arg value="${basedir}/../JSI2/web/scripts/" />
+			<arg value="-config.debugCalls" />
+			<arg value="$log.debug,$log.trace,$log.trace" />
+			<arg value="-config.features" />
+			<arg value="org.xidea.jsi.boot:$log" />
+			<arg value="-config.ascii" />
+			<arg value="false" />
+			<arg value="-lineSeparator" />
+			<arg value="\r\n&#10;/*-+-*/\r\n" />
+
+			<arg value="-bootPackage" />
+			<arg value="org.xidea.jsidoc.util" />
+			<arg value="org.xidea.jsidoc.export" />
+			<arg value="-exports" />
+			<arg value="org.xidea.jsidoc.util.*" />
+			<arg value="org.xidea.jsidoc.export.*" />
+			<arg value="-bootCached" />
+			<arg value="org.xidea.jsidoc.util:*" />
+			<arg value="-outputBoot" />
+			<arg value="${basedir}/build/dest/boot.js" />
+			<arg value="-outputJAR" />
+			<arg value="${basedir}/build/dest/export.jar" />
+			<arg value="-outputXML" />
+			<arg value="${basedir}/build/dest/export.xml" />
+			<arg value="-outputExported" />
+			<arg value="${basedir}/build/dest/export.js" />
+			<arg value="-outputPreload" />
+			<arg value="${basedir}/build/dest/preload.js" />
+		</java>
+	</target>
+```
+    1. 生成JSI包定义文件实例
+```
+	<target name="packageOptimize">
+		<java classname="org.jside.jsi.tools.web.PackageAction" classpath="../JSA/build/dest/JSA-CMD.jar">
+			<arg value="-scriptBase" />
+			<arg value="${basedir}/web/scripts" />
+			<arg value="-output" />
+			<arg value="${basedir}/build/dest/package-gen.js" />
+
+			<arg value="-packageName" />
+			<arg value="org.xidea.jsidoc.export" />
+
+			<arg value="-dependences" />
+			<arg value="org.xidea.jsidoc" />
+			<arg value="org.xidea.jsidoc.util" />
+		</java>
+	</target>
+```
+> ### 命令行接口 ###
+> > ant接口本质就是命令行接口。
+## 命令行处理方式 ##
+> > JSA的命令行处理方式类似于WebWork(struts2)的http 参数自动设置处理。
+> > JSA采用JSEL作为命令行解析和自动装配。
+
+
+> 在输入参数中，每遇到'-'开头的参数，当作一个参数名称，以后出现的参数都是这个参数名的值，多值按数组处理。最终，命令行被解析成一个Map<String,String[.md](.md)>数据结构。与HttpServletRequest#getParameterMap()返回数据格式一致。
+
+
+> 然后依次以map的键作为el，设置目标作为el上下文，计算目标对象的属性。并将该键对应的值作为数据，转化成目标属性需要的类型，设置属性值。
